@@ -8,7 +8,7 @@ from sqlalchemy import or_
 from app.core.database import get_db
 from app.models.models import (
     Invoice, InvoiceLine, Subscription, Customer,
-    Payment, User, InvoiceStatus
+    Payment, User, InvoiceStatus, SubscriptionStatus
 )
 from app.schemas.schemas import InvoiceResponse, InvoiceGenerateRequest
 from app.api.deps import (

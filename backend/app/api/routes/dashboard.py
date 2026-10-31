@@ -77,13 +77,29 @@ def get_dashboard_analytics(
     ).order_by(Invoice.due_date.asc()).limit(5).all()
     overdue_invs_resp = [build_invoice_response(i) for i in overdue_invs]
 
-    # Monthly revenue distribution (mocked aggregate over dates in SQLite or computed)
-    # Group payments by month
+    # Monthly revenue: real aggregation of payments grouped by calendar month (last 6 months)
+    monthly_map = {}
+    for pdate, amt in db.query(Payment.payment_date, Payment.amount).all():
+        if pdate is None:
+            continue
+        key = (pdate.year, pdate.month)
+        monthly_map[key] = monthly_map.get(key, 0.0) + float(amt)
+
+    buckets = []
+    y, m = today.year, today.month
+    for i in range(5, -1, -1):
+        mm, yy = m - i, y
+        while mm <= 0:
+            mm += 12
+            yy -= 1
+        buckets.append((yy, mm))
+
     monthly_data = [
-        MonthlyRevenueItem(month="Jan", revenue=round(total_rev * 0.12, 2)),
-        MonthlyRevenueItem(month="Feb", revenue=round(total_rev * 0.18, 2)),
-        MonthlyRevenueItem(month="Mar", revenue=round(total_rev * 0.25, 2)),
-        MonthlyRevenueItem(month="Apr", revenue=round(total_rev * 0.45, 2)),
+        MonthlyRevenueItem(
+            month=date(yy, mm, 1).strftime("%b %Y"),
+            revenue=round(monthly_map.get((yy, mm), 0.0), 2)
+        )
+        for yy, mm in buckets
     ]
 
     return {

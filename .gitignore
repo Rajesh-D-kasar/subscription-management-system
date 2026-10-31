@@ -16,3 +16,14 @@ build/
 *.egg-info/
 .DS_Store
 Thumbs.db
+.neon
+.neon-config/
+node_modules/
+
+# Local AI/agent tooling artifacts (Neon setup) - not part of the app
+.agents/
+.vscode/
+neon.ts
+skills-lock.json
+package.json
+package-lock.json
