@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluxSub - Modern Subscription Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Toast Notification Hub -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- AUTH VIEW -->
+  <div id="authView" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <div class="brand-icon">⚡</div>
+          <h1>FluxSub ERP</h1>
+        </div>
+        <p class="auth-subtitle">Subscription Management System (Odoo x FLUX 2026)</p>
+      </div>
+
+      <div class="auth-tabs">
+        <div id="tabLogin" class="auth-tab active" onclick="switchAuthTab('login')">Sign In</div>
+        <div id="tabRegister" class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+        <div id="tabForgot" class="auth-tab" onclick="switchAuthTab('forgot')">Reset</div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="formLogin" onsubmit="handleLogin(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" class="form-control" required placeholder="admin@example.com" value="admin@example.com">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label>Password</label>
+          <input type="password" id="loginPassword" class="form-control" required placeholder="••••••••" value="Admin@12345">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In to Dashboard</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="formRegister" onsubmit="handleRegister(event)" style="display: none;">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>Full Name</label>
+          <input type="text" id="regName" class="form-control" required placeholder="John Doe">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" class="form-control" required placeholder="john@example.com">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>Company / Organization</label>
+          <input type="text" id="regCompany" class="form-control" placeholder="Acme Tech">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>Password (Min 9 chars, Upper, Lower, Symbol)</label>
+          <input type="password" id="regPassword" class="form-control" required placeholder="Pass@12345">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Customer Account</button>
+      </form>
+
+      <!-- Reset Password Form -->
+      <form id="formForgot" onsubmit="handleForgotPassword(event)" style="display: none;">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label>Registered Email</label>
+          <input type="email" id="resetEmail" class="form-control" required placeholder="user@example.com">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Generate Reset Token</button>
+        <div id="resetTokenResult" style="display:none; font-size:12px; word-break:break-all; background:#f1f5f9; padding:8px; border-radius:6px;"></div>
+      </form>
+
+      <!-- Hackathon Demo Credentials Helper -->
+      <div class="demo-credentials">
+        <strong>Demo Accounts for Evaluators:</strong><br/>
+        • <b>Admin:</b> admin@example.com / Admin@12345<br/>
+        • <b>Staff:</b> staff@example.com / Staff@12345<br/>
+        • <b>Customer:</b> customer@example.com / Customer@12345
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP VIEW (DASHBOARD & ERP SECTIONS) -->
+  <div id="appView" style="display: none; width: 100vw; min-height: 100vh;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-details">
+          <h2>FluxSub ERP</h2>
+          <span>Subscription OS</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Main</div>
+        <a class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard & Analytics
+        </a>
+
+        <div class="nav-section-title">Operations</div>
+        <a class="nav-item" onclick="navigate('subscriptions')" id="nav-subscriptions">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Subscriptions
+        </a>
+
+        <a class="nav-item" onclick="navigate('invoices')" id="nav-invoices">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Invoices & Billing
+        </a>
+
+        <a class="nav-item" onclick="navigate('payments')" id="nav-payments">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          Payments
+        </a>
+
+        <div class="nav-section-title admin-only">Catalog & Setup</div>
+        <a class="nav-item admin-only" onclick="navigate('products')" id="nav-products">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          Products & Variants
+        </a>
+
+        <a class="nav-item admin-only" onclick="navigate('plans')" id="nav-plans">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Subscription Plans
+        </a>
+
+        <a class="nav-item admin-only" onclick="navigate('discounts')" id="nav-discounts">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          Discounts & Promos
+        </a>
+
+        <a class="nav-item staff-or-admin" onclick="navigate('customers')" id="nav-customers">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Customers Directory
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-badge">
+          <div class="avatar" id="currentUserInitial">A</div>
+          <div class="user-info">
+            <div class="user-name" id="currentUserName">Alex Admin</div>
+            <div class="user-role" id="currentUserRole">Admin</div>
+          </div>
+        </div>
+        <button class="btn-logout" title="Sign Out" onclick="handleLogout()">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title" id="pageTitle">Dashboard & Business Metrics</h1>
+        </div>
+        <div class="topbar-right" id="topbarActions">
+          <!-- Dynamic Action Buttons -->
+        </div>
+      </header>
+
+      <div class="page-container" id="mainContainer">
+        <!-- Rendered by app.js router -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Shared Modal Hub -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Modal Dialog</h3>
+        <button class="btn-secondary btn-sm" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic Modal Form Content -->
+      </div>
+      <div class="modal-footer" id="modalFooter">
+        <!-- Dynamic Modal Action Buttons -->
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
