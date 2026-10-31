@@ -20,6 +20,9 @@ Thumbs.db
 .neon-config/
 node_modules/
 
+# Vercel local project state (do not commit)
+.vercel/
+
 # Local AI/agent tooling artifacts (Neon setup) - not part of the app
 .agents/
 .vscode/
